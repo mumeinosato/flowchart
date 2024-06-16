@@ -11,7 +11,10 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "dompurify": "^3.1.5",
+    "flowchart.js": "^1.18.0",
     "pinia": "^2.1.7",
+    "ts-graphviz": "^2.1.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
