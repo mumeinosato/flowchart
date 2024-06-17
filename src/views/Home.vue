@@ -1,45 +1,58 @@
 <template>
-    <div>
-      <textarea v-model="chartDefinition" @input="updateChart" rows="10" cols="50"></textarea>
-      <div ref="chartContainer"></div>
-    </div>
-  </template>
-  
-  <script>
-  import flowchart from 'flowchart.js';
-  
-  export default {
-    data() {
-      return {
-        chartDefinition: 'st=>start: Start\nop=>operation: My Operation\ncond=>condition: Yes or No?\ne=>end: End\n\nst->op->cond\ncond(yes)->e\ncond(no)->op',
-        chart: null // チャートオブジェクトを保持するための変数を追加
-      };
-    },
-    methods: {
-      updateChart() {
-        if (this.chart) {
-          this.chart.clean(); // 古いチャートをクリーンアップする
-        }
-        this.$nextTick(() => {
-          this.chart = flowchart.parse(this.chartDefinition);
-          this.chart.drawSVG(this.$refs.chartContainer);
-        });
-      }
-    },
-    mounted() {
-      this.updateChart();
-    },
-    beforeDestroy() {
-      if (this.chart) {
-        this.chart.clean(); // コンポーネントが破棄される前にクリーンアップする
-      }
+  <div id="main">
+    <codemirror
+    v-model="code"
+    placeholder="Code goes here..."
+    :style="{ height: '400px' }"
+    :autofocus="true"
+    :indent-with-tab="true"
+    :tab-size="2"
+    :extensions="extensions"
+    @ready="handleReady"
+    @change="log('change', $event)"
+    @focus="log('focus', $event)"
+    @blur="log('blur', $event)"
+  />
+    <textarea v-model="dotInput" @input="renderGraph" rows="10"></textarea>
+    <div id="graph" style="text-align: center; margin-top: 20px;"></div>
+  </div>
+</template>
+
+<script>
+import * as d3 from 'd3';
+import { graphviz } from 'd3-graphviz';
+import { Codemirror } from 'vue-codemirror';
+
+export default {
+  data() {
+    return {
+      dotInput: `digraph G {
+        A -> B;
+        B -> C;
+        C -> A;
+      }`
+    };
+  },
+  mounted() {
+    this.renderGraph();
+  },
+  methods: {
+    renderGraph(){
+      d3.select("#graph").graphviz()
+        .renderDot(this.dotInput);
     }
-  };
-  </script>
-  
-  <style scoped>
-  textarea {
-    width: 100%;
-    margin-bottom: 20px;
   }
-  </style>
+}
+</script>
+
+<style>
+#main {
+  text-align: center;
+  margin-top: 20px;
+}
+textarea {
+  width: 80%;
+  margin: 0 auto;
+  display: block;
+}
+</style>
